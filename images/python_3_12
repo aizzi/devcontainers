@@ -1,0 +1,48 @@
+FROM ubuntu:22.04
+ARG PYTHON_VERSION="3.12.1"
+ARG PLANTUML_VERSION="1.2023.13"
+ENV DEBIAN_FRONTEND noninteractive
+
+# Install Ubuntu server
+RUN apt-get update -y \
+    && apt-get install -y ubuntu-server
+
+# Install Python 3.12
+# Instruction from https://stackoverflow.com/questions/75159821/installing-python-3-11-1-on-a-docker-container
+RUN apt-get install -y apt-utils
+RUN apt-get install -y build-essential
+RUN apt-get install -y zlib1g-dev
+RUN apt-get install -y libncurses5-dev
+RUN apt-get install -y libgdbm-dev
+RUN apt-get install -y libnss3-dev
+RUN apt-get install -y libssl-dev
+RUN apt-get install -y libreadline-dev
+RUN apt-get install -y libffi-dev
+RUN apt-get install -y libsqlite3-dev
+RUN apt-get install -y libbz2-dev
+RUN apt-get install -y pkg-config
+RUN apt-get install -y wget
+RUN cd /usr/src \
+    && wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
+    && tar -xzf Python-${PYTHON_VERSION}.tgz \
+    && cd Python-${PYTHON_VERSION} \
+    && ./configure --enable-optimizations \
+    && make altinstall
+RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.12 1
+
+# Install pip
+RUN apt-get install -y python3-pip
+
+# Install the environment to support plantuml diagrams
+RUN apt-get install -y default-jre && \
+    apt-get install -y graphviz && \
+    apt-get install -y plantuml && \
+    wget -O /usr/share/plantuml/plantuml.jar https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml.jar
+
+# Update and upgrade
+RUN apt-get update -y \
+    && apt-get upgrade -y
+
+# Clean up
+RUN apt-get purge -y imagemagick imagemagick-6-common \
+    && apt-get clean

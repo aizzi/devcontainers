@@ -1,0 +1,13 @@
+FROM aizzi/devcontainers:python.3.12
+ENV DEBIAN_FRONTEND noninteractive
+
+# Install streamlit
+RUN pip install streamlit
+
+# Update and upgrade
+RUN apt-get update -y \
+    && apt-get upgrade -y
+
+# Clean up
+RUN apt-get purge -y imagemagick imagemagick-6-common \
+    && apt-get clean
