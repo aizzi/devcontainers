@@ -9,19 +9,7 @@ RUN apt-get update -y \
 
 # Install Python 3.12
 # Instruction from https://stackoverflow.com/questions/75159821/installing-python-3-11-1-on-a-docker-container
-RUN apt-get install -y apt-utils
-RUN apt-get install -y build-essential
-RUN apt-get install -y zlib1g-dev
-RUN apt-get install -y libncurses5-dev
-RUN apt-get install -y libgdbm-dev
-RUN apt-get install -y libnss3-dev
-RUN apt-get install -y libssl-dev
-RUN apt-get install -y libreadline-dev
-RUN apt-get install -y libffi-dev
-RUN apt-get install -y libsqlite3-dev
-RUN apt-get install -y libbz2-dev
-RUN apt-get install -y pkg-config
-RUN apt-get install -y wget
+RUN apt-get install -y apt-utils build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev libbz2-dev pkg-config wget
 RUN cd /usr/src \
     && wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
     && tar -xzf Python-${PYTHON_VERSION}.tgz \
@@ -30,13 +18,11 @@ RUN cd /usr/src \
     && make altinstall
 RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.12 1
 
-# Install pip
-RUN apt-get install -y python3-pip
+# Install pip and pipx
+RUN apt-get install -y python3-pip pipx
 
 # Install the environment to support plantuml diagrams
-RUN apt-get install -y default-jre && \
-    apt-get install -y graphviz && \
-    apt-get install -y plantuml && \
+RUN apt-get install -y default-jre graphviz plantuml && \
     wget -O /usr/share/plantuml/plantuml.jar https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml.jar
 
 # Update and upgrade
@@ -46,3 +32,11 @@ RUN apt-get update -y \
 # Clean up
 RUN apt-get purge -y imagemagick imagemagick-6-common \
     && apt-get clean
+
+# Install poetry
+ENV PATH /root/.local/bin:$PATH
+RUN pipx install poetry==1.7.0 \
+    && pipx ensurepath \
+    && poetry completions bash >> ~/.bash_completion \
+    && poetry self add "poetry-dynamic-versioning[plugin]"
+
