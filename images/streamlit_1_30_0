@@ -1,6 +1,10 @@
 FROM aizzi/devcontainers:python.3.12
 ENV DEBIAN_FRONTEND noninteractive
 
+# Install sqlite3
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends sqlite3
+
 # Install streamlit
 RUN pipx install streamlit==1.30.0
 
