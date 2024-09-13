@@ -1,10 +1,12 @@
-FROM ubuntu:22.04
-ARG PYTHON_VERSION="3.12.1"
-ARG PLANTUML_VERSION="1.2023.13"
+FROM ubuntu:24.04
+ARG PYTHON_VERSION="3.12.6"
+ARG POETRY_VERSION="1.8"
+ARG PLANTUML_VERSION="1.2024.7"
 ENV DEBIAN_FRONTEND noninteractive
 
-# Install Ubuntu server
+# Update, Upgrade and Install Ubuntu server
 RUN apt-get update -y \
+    && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends ubuntu-server
 
 # Install Python 3.12
@@ -28,8 +30,8 @@ RUN apt-get install -y --no-install-recommends default-jre graphviz plantuml \
     && wget -O /usr/share/plantuml/plantuml.jar https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml.jar
 
 # Update and upgrade
-RUN apt-get update -y \
-    && apt-get upgrade -y
+#RUN apt-get update -y \
+#    && apt-get upgrade -y
 
 # Clean up
 RUN apt-get purge -y imagemagick imagemagick-6-common \
@@ -37,7 +39,7 @@ RUN apt-get purge -y imagemagick imagemagick-6-common \
 
 # Install poetry
 ENV PATH /root/.local/bin:$PATH
-RUN pipx install poetry==1.7.0 \
+RUN pipx install poetry==${POETRY_VERSION} \
     && poetry completions bash >> ~/.bash_completion \
     && poetry self add "poetry-dynamic-versioning[plugin]"
 
